@@ -5,6 +5,7 @@ const pager = document.querySelector('#paginacion');
 const imagesPerPage = 40;
 let totalPages;
 let iterator;
+let actualPage = 1;
 
 window.onload = () => {
     form.addEventListener('submit', validateForm);
@@ -20,7 +21,7 @@ function validateForm(e) {
         return;
     }
 
-    searchImages(searchTerm);
+    searchImages();
 }
 
 function showAlert(message) {
@@ -46,9 +47,10 @@ function showAlert(message) {
     }
 }
 
-function searchImages(term) {
+function searchImages() {
+    const term = document.querySelector('#termino').value;
     const key = '...YOUR...API...KEY...';
-    const url = `https://pixabay.com/api/?key=${key}&q=${term}&per_page=${imagesPerPage}`;
+    const url = `https://pixabay.com/api/?key=${key}&q=${term}&per_page=${imagesPerPage}&page=${actualPage}`;
     
     fetch(url)
         .then(data => data.json())
@@ -121,7 +123,12 @@ function printPager() {
         button.href = '#';
         button.dataset.pagina = value;
         button.textContent = value;
-        button.classList.add('siguiente','bg-yellow-400','px-4','py-1','mr-2','font-bold','mb-4','uppercase','rounded',);
+        button.classList.add('siguiente','bg-yellow-400','px-4','py-1','mr-2','font-bold','mb-4','rounded',);
+
+        button.onclick = () => {
+            actualPage = value;
+            searchImages();
+        }
 
         pager.appendChild(button);
     }
