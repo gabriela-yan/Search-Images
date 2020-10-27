@@ -1,6 +1,9 @@
 const result = document.querySelector('#resultado');
 const form = document.querySelector('#formulario');
 
+const imagesPerPage = 40;
+let totalPages;
+
 window.onload = () => {
     form.addEventListener('submit', validateForm);
 }
@@ -48,12 +51,17 @@ function searchImages(term) {
     fetch(url)
         .then(data => data.json())
         .then(response => {
+            totalPages = calculatePages(response.totalHits);
             showImages(response.hits);
         })
 }
 
+function calculatePages(total) {
+    return parseInt(Math.ceil(total/imagesPerPage));
+}
+
 function showImages(images){
-    console.log(images);
+    // console.log(images); Test
     cleanHTML();
 
     // Iterate over the image array and build the HTML
