@@ -1,8 +1,10 @@
 const result = document.querySelector('#resultado');
 const form = document.querySelector('#formulario');
+const pager = document.querySelector('#paginacion');
 
 const imagesPerPage = 40;
 let totalPages;
+let iterator;
 
 window.onload = () => {
     form.addEventListener('submit', validateForm);
@@ -46,7 +48,7 @@ function showAlert(message) {
 
 function searchImages(term) {
     const key = '...YOUR...API...KEY...';
-    const url = `https://pixabay.com/api/?key=${key}&q=${term}&per_page=50`;
+    const url = `https://pixabay.com/api/?key=${key}&q=${term}&per_page=${imagesPerPage}`;
     
     fetch(url)
         .then(data => data.json())
@@ -54,7 +56,18 @@ function searchImages(term) {
             totalPages = calculatePages(response.totalHits);
             showImages(response.hits);
         })
+        .catch(error => {
+            console.log(error);
+        })
 }
+
+// Generator that will record the number of elements according to the pages
+function *createPager(total) {
+    for(let i = 1; i <= total; i++){
+        yield i;
+    }
+}
+
 
 function calculatePages(total) {
     return parseInt(Math.ceil(total/imagesPerPage));
@@ -62,7 +75,9 @@ function calculatePages(total) {
 
 function showImages(images){
     // console.log(images); Test
-    cleanHTML();
+    while(result.firstChild){
+        result.removeChild(result.firstChild);
+    }
 
     // Iterate over the image array and build the HTML
     images.forEach( image => {
@@ -85,10 +100,30 @@ function showImages(images){
             </div>
         `;
     });
+
+    // Clean preview pager
+    while(pager.firstChild){
+        pager.removeChild(pager.firstChild);
+    }
+
+    printPager();
 }
 
-function cleanHTML() {
-    while(result.firstChild){
-        result.removeChild(result.firstChild);
+function printPager() {
+    iterator = createPager(totalPages);
+
+    while(true){
+        const { value, done } = iterator.next();
+        if(done) return;
+
+        // Otherwise it generates a button for each element in the generator
+        const button = document.createElement('a');
+        button.href = '#';
+        button.dataset.pagina = value;
+        button.textContent = value;
+        button.classList.add('siguiente','bg-yellow-400','px-4','py-1','mr-2','font-bold','mb-4','uppercase','rounded',);
+
+        pager.appendChild(button);
     }
 }
+
