@@ -47,20 +47,19 @@ function showAlert(message) {
     }
 }
 
-function searchImages() {
+async function searchImages() {
     const term = document.querySelector('#termino').value;
     const key = '...YOUR...API...KEY...';
     const url = `https://pixabay.com/api/?key=${key}&q=${term}&per_page=${imagesPerPage}&page=${actualPage}`;
     
-    fetch(url)
-        .then(data => data.json())
-        .then(response => {
-            totalPages = calculatePages(response.totalHits);
-            showImages(response.hits);
-        })
-        .catch(error => {
-            console.log(error);
-        })
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        totalPages = calculatePages(data.totalHits);
+        showImages(data.hits);
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 // Generator that will record the number of elements according to the pages
